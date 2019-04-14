@@ -62,7 +62,11 @@ class GlancePanel(private val project: Project, fileEditor: FileEditor, private 
     // Anonymous Listeners that should be cleaned up.
     private val componentListener: ComponentListener
     private val documentListener: DocumentListener
-    private val selectionListener: SelectionListener = SelectionListener { repaint() }
+    private val selectionListener: SelectionListener = object: SelectionListener {
+        override fun selectionChanged(e: SelectionEvent) {
+            repaint()
+        }
+    }
 
     private val isDisabled: Boolean
         get() = config.disabled || editor.document.textLength > config.maxFileSize || editor.document.lineCount < config.minLineCount || container.width < config.minWindowWidth
@@ -86,7 +90,7 @@ class GlancePanel(private val project: Project, fileEditor: FileEditor, private 
         container.addComponentListener(componentListener)
 
         documentListener = object : DocumentAdapter() {
-            override fun documentChanged(documentEvent: DocumentEvent?) {
+            override fun documentChanged(event: DocumentEvent) {
                 updateImage()
             }
         }
